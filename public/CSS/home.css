@@ -1,0 +1,94 @@
+body{
+    font-family: 'Segoe UI';
+    user-select: none;
+    background-color: #e6f7ff;
+}
+.parent{
+    width: 100%;
+    height: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.header{
+    height: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    background-color: #0080ff;
+    border-radius: 4px;
+    position: relative;
+    top: -25px;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+.header p{
+    font-weight: bold;
+    font-size: 16px;
+}
+.header img{
+    width: 30px;
+    height: 30px;
+    position: relative;
+    top: 10px;
+}
+.logo{
+    display: flex;
+    justify-content: space-around;
+    width: 90px;
+    height: 100%;
+    position: relative;
+}
+.main{
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    width: 300px;
+    height: 250px;
+    background-color: #4da6ff;
+    border-radius: 4px;
+    align-items: center;
+}
+input[type="text"],input[type="password"]{
+    width: 260px;
+    height: 20px;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+}
+input[type="text"]:focus,input[type="password"]{
+    outline: red;
+    outline:black;
+}
+button{
+    width:270px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    padding: 5px;
+    background-color: #0080ff;
+    color: white;
+}
+button:hover{
+    background-color: white;
+    color: red;
+    border-radius: 1px #0080ff solid;
+}
+a{
+    color: blue;
+    text-decoration: none;
+}
+a:hover{text-decoration: underline;}
+#prompt{
+    color:red;
+    font-size: 14px;
+    text-align: center;
+}
+
+@media (max-width:350px){
+    .main{width: 270px;}
+    input[type="text"]{width: 230px;}
+    button{width: 230px;}
+}

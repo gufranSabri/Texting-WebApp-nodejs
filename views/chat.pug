@@ -1,0 +1,105 @@
+doctype html
+html
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    head
+        title GeeChats - Chat
+
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/JS/chat.js")
+    link(rel='stylesheet' type='text/css' href='/CSS/chat.css')
+    link(rel='shortcut icon' type='image/png' href='/Images/logo.png')
+
+    script.
+        var contact="", slide=true, you='!{user}', socket, entering=false;
+        $(document).ready(function(){
+            if(!you)location.href="/";
+            
+            socket = io()
+            '!{rooms}'.split(',').forEach(addUser)
+            '!{bList}'.split(',').forEach(addBlockedUser)
+
+            socket.emit('joinRooms', {user:you})
+            socket.on('message',(data)=>{handleEmission(data.sentTo==you?data.sender:data.sentTo, data.text, data.sender==you?true:false)})
+            socket.on('newFriend',(data)=>{
+                addUser(data.friend, roomCount);
+                socket.emit('joinRoom', {user:you,friend:data.friend,dontPingAgain:true})
+            })
+            socket.on("loads",(data)=>{loadMessages();})
+            socket.on("blocker",(data)=>{if(data.blocker==you)location.reload()})
+
+            $(".parent").css("height",($(document).height()-20)+"px")
+            setInterval(function(){
+                $(".parent").css("height",($(document).height()-20)+"px")
+                if($(document).width()>=645)$(".nav").css("display","flex")
+                //- $(".confirmation").css("left",($(document).width()/2) - parseInt($(".confirmation").css("width"))/2)
+                //- $(".confirmation").css("top",($(document).height()/2) - parseInt($(".confirmation").css("height"))/2)
+            },1000)
+
+            $("#u").click(function(){if(slide)$("#conts").slideToggle(100)})
+            $("#f").click(function(){if(slide)$("#fReqs").slideToggle(100)})
+            $("#b").click(function(){if(slide)$("#bConts").slideToggle(100)})
+            $(".hamburgerHolder").click(function(){if($(document).width()<645)$(".nav").slideToggle(100)})
+            $("input,.user, button, select, option").click(function(){
+                slide=false;
+                setTimeout(function(){slide=true},50)
+            })
+            $("#l").click(function(){location.href="/logout"})
+            $("#send").click(function(){
+                socket.emit('chatMessage',{text:$("#text").val().replace(/&/gi,"&amp;").replace(/</gi,"&lt;").replace(/>/gi,"&gt;"), sender:you, c:contact})
+                $("#text").val("")
+                $("#text").focus()
+            })
+            $("#sr").click(sendRequest);
+            $("#block").click(function(){
+                var ans= prompt("Are you sure you want to block "+ contact+ "? This will delete your entire chat history. \nType Y to confirm.")
+                if(ans=='y'||ans=="Y")socket.emit("block", {blocker:you, blocked:contact})
+            })
+            document.addEventListener("keyup",function(evt){
+                if(evt.keyCode==13&&!entering)$("#send").click()
+                if(evt.keyCode==16)entering=false;
+                
+            });
+            document.addEventListener("keydown",function(evt){if(evt.keyCode==16)entering=true;});
+        })
+    body
+        .parent
+            .header
+                .logo
+                    img(src="/Images/logo.png")
+                    p eeChats
+                .contact
+                    span#contName
+                    .hamburgerHolder 
+                        img(src="/Images/nav.png")
+                    //- .cButtons
+                        //- button#block
+                            |Block
+            .parent2
+                .nav
+                    .tab#u
+                        span Contacts &#8250;
+                        .subTab#conts
+                    .tab#f
+                        span Add Friends &#8250;
+                        |&nbsp&nbsp&nbsp
+                        .subTab#fReqs
+                            input#name(style="border-radius:4px" placeholder="Enter username" autocomplete="off")
+                            |&nbsp
+                            br
+                            button#sr Add Friend
+                            br
+                            span(style="font-size:12px;color:#ffe6f0")#prompt 
+                            br
+                    .tab#b
+                        span Settings &#8250;
+                        .subTab#bConts
+                            
+                    .tab#l
+                        span Log Out
+                .main
+                    .chat 
+                    .bottom
+                        textarea#text(style="visibility:hidden")
+                        button#send(style="visibility:hidden") 
+                            img(src="/Images/send.png")

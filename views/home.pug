@@ -1,0 +1,50 @@
+doctype html
+html
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    head
+        title GeeChats - home
+
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js")
+    link(rel='stylesheet' type='text/css' href='/CSS/home.css')
+    link(rel='shortcut icon' type='image/png' href='/Images/logo.png')
+
+    script.
+        $(document).ready(function(){
+            $("#id").val("Ahmed")
+            $("#pass").val("wamedoo5")
+            $("#b").click(function(){
+                $.post("/", {id:$("#id").val(), pass:$("#pass").val(), signUp:($("#b").html()=="Log In"?false:true)},
+                function(data,status){
+                    $("#id").val(data.id)
+                    $("#pass").val(data.pass)
+                    if(data.res=="wp")$("#prompt").html("Wrong username/password!")
+                    else if(data.res=="bp")$("#prompt").html("Password must include only letters and digits and<br> must be 8-15 characters in length!")
+                    else if(data.res=="bu")$("#prompt").html("Username must include only underscore, letters and digits and<br> must be 8-15 characters in length!")
+                    else if(data.res=="ut")$("#prompt").html("Username already taken!")
+                    else location.href="/chat"
+                })
+            })
+            document.addEventListener("keyup",function(evt){if(evt.keyCode==13)$("#b").click()});
+            $("a").click(function(){
+                if($("#prompt").html()!="Welcome to GeeChats!")$("#prompt").html("")
+                $("#b").html($(this).html())
+                if($(this).html()=="Sign Up")$(this).html("Log In")
+                else $(this).html("Sign Up")
+            })
+        })
+    body
+        .parent
+            p#prompt Welcome to GeeChats!
+            .main
+                .header
+                    .logo
+                        img(src="/Images/logo.png")
+                        p eeChats
+                form#theForm(action="/" method="POST" autocomplete="off")
+                    input#id(type="text" name="id" placeholder="Username")
+                    br
+                    br
+                    input#pass(type="password" name="pass" placeholder="Password")
+                button#b(style="cursor:pointer") Log In
+            br
+            a(href="#") Sign Up
