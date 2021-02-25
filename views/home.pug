@@ -10,8 +10,6 @@ html
 
     script.
         $(document).ready(function(){
-            $("#id").val("Ahmed")
-            $("#pass").val("wamedoo5")
             $("#b").click(function(){
                 $.post("/", {id:$("#id").val(), pass:$("#pass").val(), signUp:($("#b").html()=="Log In"?false:true)},
                 function(data,status){
