@@ -247,9 +247,9 @@ function returnRoom(u,f){
 }
 function DBConnection(){
     return mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "wamedoo5",
-        database:"gchat"
+        host: "bahl9tmdymrvsnpq1sqy-mysql.services.clever-cloud.com",
+        user: "uwvnqwcwlqkbase1",
+        password: "bV5G52qtesPOHX0c68fh",
+        database:"bahl9tmdymrvsnpq1sqy"
     });
 }
