@@ -19,8 +19,8 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-const server = app.listen(process.env.PORT||3000);
-const io = require('socket.io')(server);
+var server = app.listen(process.env.PORT||3000);
+var io = require('socket.io')(server);
 
 var sockets=[]
 var indices={}
