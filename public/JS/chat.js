@@ -92,7 +92,7 @@ function sendRequest(){
             else if(data.res=="same")$("#prompt").html(" You lonely af to try to friend yourself damn!")
             else if(data.res=="ghost") $("#prompt").html(" User doesn't exist!"); 
             else if(data.res=="blocked")$("#prompt").html("You've been blocked...")
-            else $("prompt").html("Sorry! Could not process your request..")
+            else $("#prompt").html("Sorry! Could not process your request..")
         })
     }
 }

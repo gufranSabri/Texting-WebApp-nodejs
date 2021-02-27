@@ -29,10 +29,16 @@ io.on('connection',function(socket){
     socket.on('joinRooms',(data)=>{
         var con = DBConnection()
         con.connect(function(err) {
-            if (err) res.render("error");
+            if (err) {
+                res.render("error");
+                con.end()
+            }
             var query= "SELECT Name FROM Rooms WHERE BINARY Uname = '" + data.user + "'"
             con.query(query, function (err, result, fields) {
-                if (err) res.render("error");;
+                if (err) {
+                    res.render("error");
+                    con.end()
+                }
                 for (let i = 0; i < result.length; i++) socket.join(result[i].Name)
                 if(indices[data.user]==undefined){
                     sockets.push({id:socket.id,name:data.user})
@@ -64,11 +70,15 @@ io.on('connection',function(socket){
         }
         var con = DBConnection()
         con.connect(function(err) {
-            if (err) res.render("error", {data:err})
+            if (err) {
+                res.render("error", {data:err})
+                con.end()
+            }
             data.text= data.text.replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\\n/g,"\\\\n").replace(/\\r/g,"\\\\r").replace(/\\x1a/g,"\\\\x1a")
             var query = "INSERT INTO Texts VALUES('" + returnRoom(data.sender,data.c) +"', '" + data.sender + "', '" + data.text + "', 'N',NOW())"
             con.query(query, function (err2, result) {
-              if (err2) res.render("error", {data:err2})
+                if (err2) res.render("error", {data:err2})
+                con.end();
             });
         });
         io.to(returnRoom(data.sender,data.c)).emit('message',{text:data.text, sentTo:data.c, sender:data.sender})
@@ -78,7 +88,10 @@ io.on('connection',function(socket){
         var bRoom= returnRoom(data.blocker,data.blocked)
         var query="INSERT INTO BlockList VALUES('" + data.blocker +"', '" + data.blocked + "')"
         con.query(query, function (err, result) {
-            if (err) res.render("error",{data:err});;
+            if (err) {
+                res.render("error",{data:err});;
+                con.end()
+            }
             io.to(bRoom).emit("blocker", {blocker:data.blocker, blocked:data.blocked})
             socket.leave(bRoom)
             con.end()
@@ -87,10 +100,16 @@ io.on('connection',function(socket){
     socket.on("read",(data)=>{
         var con = DBConnection()
         con.connect(function(err) {
-            if (err) throw err;
+            if (err) {
+                res.render("error")
+                con.end();
+            }
             var query = "UPDATE Texts SET Readed = 'Y' WHERE BINARY Room = '" + returnRoom(data.sender,data.sentTo) +"' AND BINARY Sender='"+ data.sender +"'";
             con.query(query, function (err2, result) {
-                if (err2) throw err2;
+                if (err2) {
+                    res.render("error")
+                    con.end();
+                }
                 con.end();
             });
         });
@@ -113,35 +132,60 @@ app.post('/',(req,res)=>{
     }
     var con = DBConnection()
     con.connect(function(err) {
-        if (err) res.render("error");;
+        if (err) {
+            res.render("error");;
+            con.end()
+        }
         var query="SELECT * FROM Users WHERE BINARY Name = '" + info.id + "'"
         con.query(query, function (err, result, fields) {
-            if (err) res.render("error");
+            if (err) {
+                res.render("error");
+                con.end()
+            }
             if(result.length!=0){
-                if(info.signUp=='true')res.send({res:"ut",id:info.id,pass:info.pass})
+                if(info.signUp=='true'){
+                    res.send({res:"ut",id:info.id,pass:info.pass})
+                    con.end()
+                }
                 else{
-                    if(result[0].Password!=info.pass)res.send({res:"wp",id:info.id,pass:info.pass})
+                    if(result[0].Password!=info.pass){
+                        res.send({res:"wp",id:info.id,pass:info.pass})
+                        con.end()
+                    }
                     else {
                         cacheData(req,info.id)
                         res.send("lool")
+                        con.end()
                     }
                 }
             }
             else{
                 if(info.signUp=='true'){
-                    if(info.id.match(/[-!@#$%^&*()+=,/'";:}<>?>`~{]/gi))res.send({res:"bu",id:info.id,pass:info.pass})
-                    else if(info.pass.match(/[-_!@#$%^&*()+=,/'";:}<>?>`~{]/gi))res.send({res:"bp", id:info.id,pass:info.pass})
+                    if(info.id.match(/[-!@#$%^&*()+=,/'";:}<>?>`~{]/gi)){
+                        res.send({res:"bu",id:info.id,pass:info.pass})
+                        con.end()
+                    }
+                    else if(info.pass.match(/[-_!@#$%^&*()+=,/'";:}<>?>`~{]/gi)){
+                        res.send({res:"bp", id:info.id,pass:info.pass})
+                        con.end()
+                    }
                     else{
                         var iQuery="INSERT INTO Users VALUES('" + info.id +"', '" + info.pass + "')"
                         con.query(iQuery, function (err, result) {
-                            if (err) res.render("error",{data:err});;
+                            if (err) {
+                                res.render("error",{data:err});
+                                con.end()
+                            }
                             cacheData(req,info.id)
                             res.send("lool")
                             con.end();
                         });
                     }
                 }
-                else res.send({res:"wp",id:info.id,pass:info.pass})
+                else {
+                    res.send({res:"wp",id:info.id,pass:info.pass})
+                    con.end()
+                }
             }
         });
     });
@@ -154,13 +198,19 @@ app.get('/chat',(req,res)=>{
     var con = DBConnection()
     var query="SELECT * FROM BlockList WHERE BINARY Blocker = '" + req.session.userId + "'";
     con.query(query, function (err, result, fields) {
-        if (err) res.render("error");
+        if (err) {
+            res.render("error");
+            con.end()
+        }
         var bList=[];
         for (let i = 0; i < result.length; i++)bList.push(result[i].Blocked);
 
         query="SELECT Name FROM Rooms WHERE BINARY UName = '" + req.session.userId + "'";
         con.query(query, function (err2, result2, fields) {
-            if (err2) res.render("error");
+            if (err2) {
+                res.render("error");
+                con.end()
+            }
             var rooms=[];
             for (let i = 0; i < result2.length; i++)if(!bList.includes(result2.Name))rooms.push(result2[i].Name);
             res.render('chat',{user:req.session.userId, rooms:rooms, bList:bList})
@@ -177,37 +227,52 @@ app.post('/chat',(req,res)=>{
     var con = DBConnection()
     con.connect(function(err) {
         if(info.user==info.friend){
+            con.end()
             res.send({res:"same"})
             return;
         }
         if(info.friend==""){
+            con.end()
             res.send({res:"ghost"})
             return;
         }
-        if(err)res.send("error")
+        if(err){
+            res.send("error")
+            con.end()
+        }
 
         var query= "SELECT * FROM Users WHERE BINARY Name='" + info.friend + "'"
         var aRoom= returnRoom(info.user,info.friend)
         con.query(query, function (err1, result, fields) {
-            if (err1) res.render("error");
+            if (err1) {
+                res.render("error");
+                con.end()
+            }
             if(result.length==0){
                 res.send({res:"ghost"});
+                con.end()
                 return;
             }
             else{
                 query= "SELECT * FROM Rooms WHERE BINARY Name='" + aRoom + "'"
                 con.query(query, function (err2, result2, fields2) {
-                    if(err2)res.render("error");
+                    if(err2){
+                        res.render("error");
+                        con.end(0)
+                    }
                     if(result2.length==0){
-                        var query2 = "INSERT INTO ROOMS (Name, Uname) VALUES ?";
+                        var query2 = "INSERT INTO Rooms (Name, Uname) VALUES ?";
                         var values=[[aRoom,info.user],[aRoom, info.friend]]
                         con.query(query2, [values], function (err3, result3) {
-                            if (err3) res.render("error");
-                            res.send({res:"sent", room:aRoom})
+                            if (err3) return res.send({res:"error"})
                             con.end();
+                            return res.send({res:"sent", room:aRoom})
                         });
                     }
-                    else res.send({res:"redundant"})
+                    else {
+                        res.send({res:"redundant"})
+                        con.end()
+                    }
                 })
             }
         })
@@ -218,7 +283,10 @@ app.post('/loads',(req,res)=>{
     var info=req.body;
     var con = DBConnection()
     con.connect(function(err) {
-        if (err) res.render("error");
+        if (err) {
+            con.end()
+            res.render("error");
+        }
         var query= "SELECT DISTINCT Name FROM Rooms WHERE BINARY Uname='" + info.user + "'"
         con.query(query, function (err1, result1, fields1) {
             var ret = [];
@@ -226,9 +294,15 @@ app.post('/loads',(req,res)=>{
                 if (err1) res.render("error");
                 query= "SELECT Sender,Text,Time,Readed FROM Texts WHERE BINARY Room='" + result1[i].Name + "' ORDER BY Time"// LIMIT " + 20
                 con.query(query, function (err2, result2, fields2) {
-                    if (err2) res.render("error");
+                    if (err2)  {
+                        con.end()
+                        res.render("error");
+                    }
                     ret.push({room:result1[i].Name, records:result2})
-                    if(i==result1.length-1)res.send(ret);
+                    if(i==result1.length-1) {
+                        con.end()
+                        res.send(ret);
+                    }
                 });
             }
         });
@@ -247,9 +321,17 @@ function returnRoom(u,f){
 }
 function DBConnection(){
     return mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "wamedoo5",
-        database:"gchat"
+        host: "bahl9tmdymrvsnpq1sqy-mysql.services.clever-cloud.com",
+        user: "uwvnqwcwlqkbase1",
+        password: "bV5G52qtesPOHX0c68fh",
+        database:"bahl9tmdymrvsnpq1sqy"
     });
 }
+// function DBConnection(){
+//     return mysql.createConnection({
+//         host: "localhost",
+//         user: "root",
+//         password: "wamedoo5",
+//         database:"gchat"
+//     });
+// }
