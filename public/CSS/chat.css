@@ -138,7 +138,7 @@ body{
     border-radius: 0px 0px 4px 0px;
 }
 #text{
-    width:90%;
+    width:80%;
     height: 80%;
     border-radius: 10px;
     outline: none;
@@ -211,6 +211,10 @@ pre{
     word-wrap: break-word;   
 }
 @media (max-width:645px){
+    .chat{
+        -ms-overflow-style: none;
+    }
+    .chat::-webkit-scrollbar {display: none;}
     .nav{
         width:95%;
         position: absolute;
@@ -232,7 +236,9 @@ pre{
         right: 0px;
         cursor: pointer;
     }
-    .bottom{border-radius: 0px 0px 4px 4px;}
+    .bottom{
+        border-radius: 4px 4px 4px 4px;
+    }
 }
 
 /* ::-webkit-scrollbar {
