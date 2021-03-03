@@ -321,10 +321,10 @@ function returnRoom(u,f){
 }
 function DBConnection(){
     return mysql.createConnection({
-        host: "bahl9tmdymrvsnpq1sqy-mysql.services.clever-cloud.com",
+        host: "bgkbzb6s0azl9nt55rk0-mysql.services.clever-cloud.com",
         user: "uwvnqwcwlqkbase1",
         password: "bV5G52qtesPOHX0c68fh",
-        database:"bahl9tmdymrvsnpq1sqy"
+        database:"bgkbzb6s0azl9nt55rk0"
     });
 }
 // function DBConnection(){
