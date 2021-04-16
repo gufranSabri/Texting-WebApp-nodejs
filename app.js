@@ -242,6 +242,7 @@ app.post('/chat',(req,res)=>{
         }
 
         var query= "SELECT * FROM Users WHERE BINARY Name='" + info.friend + "'"
+        console.log(query)
         var aRoom= returnRoom(info.user,info.friend)
         con.query(query, function (err1, result, fields) {
             if (err1) {
@@ -327,11 +328,3 @@ function DBConnection(){
         database:"bgkbzb6s0azl9nt55rk0"
     });
 }
-// function DBConnection(){
-//     return mysql.createConnection({
-//         host: "localhost",
-//         user: "root",
-//         password: "wamedoo5",
-//         database:"gchat"
-//     });
-// }
