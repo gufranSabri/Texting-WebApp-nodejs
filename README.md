@@ -1,6 +1,6 @@
 # GeeChats
 A web based texting application I made for practice. <br>
-Used Socket.IO
+Used Socket.IO for chatting implementation.
 
 
 ### Usage
